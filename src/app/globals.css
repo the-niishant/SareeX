@@ -602,8 +602,16 @@ input:focus-visible {
 
 .product-grid {
   display: grid;
+  max-width: 76rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(1rem, 2vw, 1.75rem);
+  margin-inline: auto;
+}
+
+.arrivals-section .product-card {
+  width: 100%;
+  max-width: 17.5rem;
+  margin-inline: auto;
 }
 
 .heading-aside {
@@ -1217,7 +1225,7 @@ input:focus-visible {
   }
 
   .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     row-gap: 2.5rem;
   }
 

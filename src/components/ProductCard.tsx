@@ -23,6 +23,11 @@ export function ProductCard({
   const image = saree.images[0];
   const secondaryImage = saree.images[1];
   const indexLabel = typeof index === "number" ? String(index + 1).padStart(2, "0") : null;
+  const imageSizes = variant === "lookbook"
+    ? "(max-width: 700px) 78vw, 40vw"
+    : variant === "carousel"
+      ? "(max-width: 700px) 70vw, (max-width: 1100px) 31vw, 17vw"
+      : "(max-width: 480px) 43vw, (max-width: 760px) 280px, (max-width: 900px) 28vw, 280px";
 
   return (
     <article
@@ -44,9 +49,7 @@ export function ProductCard({
             alt={image.alt}
             fill
             loading="lazy"
-            sizes={variant === "lookbook"
-              ? "(max-width: 700px) 78vw, 40vw"
-              : "(max-width: 700px) 76vw, (max-width: 1100px) 42vw, 24vw"}
+            sizes={imageSizes}
             className="product-image kinetic-image"
           />
           {secondaryImage && (
@@ -55,7 +58,7 @@ export function ProductCard({
               alt=""
               fill
               loading="lazy"
-              sizes="(max-width: 700px) 76vw, 24vw"
+              sizes={imageSizes}
               className="product-image product-image-secondary"
               aria-hidden="true"
             />
