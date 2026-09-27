@@ -1,0 +1,152 @@
+AURELIA SAREES — Premium Stack Setup
+Project root: SareeX/
+Setup date: 2026-09-27
+
+PHASE 0 — INSTALLED STACK
+
+The existing SareeX/Prd directory makes the project root non-empty, so
+create-next-app was not run in place. The Next.js App Router scaffold is
+being established in this folder without touching or replacing the PRDs.
+The package manifest was installed with `npm install`; after the first audit,
+its Next.js and React versions were updated to the supported line and installed
+again. A transitive PostCSS override is recorded below. The final `npm audit`
+reported 0 vulnerabilities. npm also warned that the optional `unrs-resolver`
+postinstall script is not allow-listed in this environment; it was not approved.
+
+IMPLEMENTATION STACK DEVIATION
+
+PRD 06's initial draft specified Next.js 14. The first install reported a
+critical audit finding, and the official support policy now lists 14.x as
+unsupported. The implementation uses Next.js 15.5.26 with React 19, the
+smallest supported major-version upgrade. Revisit PRD 06 before deployment so
+the stack lock matches the implementation. Sources: https://nextjs.org/support-policy
+and https://nextjs.org/blog/nextjs-security-update-september-22-2026
+
+Framework and UI packages:
+
+  npm install next@15.5.26 react@19 react-dom@19 gsap @gsap/react lenis lucide-react clsx tailwind-merge framer-motion radix-ui
+
+  next@15.5.26       Supported Next.js App Router, server rendering, routing, and next/image.
+  react@19            React runtime for the Next.js application.
+  react-dom@19        React DOM renderer used by Next.js.
+  gsap               Timeline and scroll animation engine; used in Round 2.
+  @gsap/react        React lifecycle integration for GSAP; used in Round 2.
+  lenis              Smooth scrolling synchronized with GSAP in Round 2.
+  lucide-react       Inline SVG icons without icon fonts.
+  clsx               Conditional class-name composition.
+  tailwind-merge     Conflict-safe Tailwind class merging.
+  framer-motion      Reserved for small component micro-interactions in Round 3.
+  radix-ui           Accessible dialog primitive used by cart, wishlist, search,
+                     quick-view, and size-guidance surfaces.
+
+  npm install -D typescript @types/node @types/react@19 @types/react-dom@19 eslint@8 eslint-config-next@15.5.26 tailwindcss@3.4.1 postcss autoprefixer prettier prettier-plugin-tailwindcss eslint-config-prettier
+
+  typescript                    Type checking and TS compiler.
+  @types/node                   Node.js type declarations.
+  @types/react                  React type declarations.
+  @types/react-dom               React DOM type declarations.
+  eslint@8                       Linting runtime.
+  eslint-config-next@15.5.26     Next.js 15 lint rules.
+  tailwindcss@3.4.1              Utility CSS framework.
+  postcss                        CSS processing used by Tailwind.
+  autoprefixer                   Adds vendor prefixes to generated CSS.
+  prettier                       Source formatter.
+  prettier-plugin-tailwindcss    Stable sorting of Tailwind classes.
+  eslint-config-prettier         Prevents ESLint/Prettier rule conflicts.
+
+Dependency override:
+
+  postcss = $postcss              Keeps nested PostCSS dependencies on the
+                                  patched root version instead of vulnerable 8.4.x.
+
+Scaffold command recorded for reference (not run because the target directory
+already contains PRDs and @latest would not pin the selected framework line):
+
+  npx create-next-app@latest . --typescript --tailwind --app --eslint --src-dir --import-alias "@/*"
+
+PHASE-SCOPED / CONDITIONAL INSTALLS
+
+Round 3 added one shadcn/Radix primitive and restyled it with AURELIA CSS:
+
+  npx shadcn@latest init --template next --base radix --no-css-variables --no-rtl --no-pointer --preset nova -y
+  npx shadcn@latest add dialog
+  npm uninstall cn class-variance-authority shadcn tw-animate-css
+
+The retained dialog wrapper is in src/components/ui/dialog.tsx. Radix supplies
+dialog focus trapping, Escape handling, and focus restoration. The generated
+button and Tailwind v4 theme were not retained; the project remains on Tailwind
+3 and uses its existing clsx/tailwind-merge utility. The shadcn CLI is invoked
+through npx and is not a runtime dependency. Search, cart, quick view, wishlist,
+size guidance, and toast behavior use small project components built around
+that dialog primitive.
+
+  npm install three @react-three/fiber @react-three/drei @react-three/postprocessing
+  npm install -D @types/three
+  npm install -D gltf-pipeline @gltf-transform/cli
+
+Three.js, R3F, postprocessing, and GLB tools remain conditional on an approved
+3D hero. Current motion uses layered image assets, so these packages are deferred.
+
+  npm install react-hook-form zod @hookform/resolvers
+
+Form validation remains conditional on an approved persisted newsletter or
+contact flow. The newsletter form currently provides an explicit not-connected
+message and does not store submitted addresses.
+
+DRACO COMPRESSION COMMAND (required for any approved GLB):
+
+  gltf-transform draco model.glb model.draco.glb
+
+LENIS + GSAP SYNCHRONIZATION (Round 2 LenisProvider):
+
+  const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+  // after mount:
+  ScrollTrigger.refresh();
+
+Round 3 motion is kept out of the initial route bundle with a dynamic
+MotionEngine import. Ken Burns ScrollTriggers for editorial images are
+registered by IntersectionObserver as those images approach the viewport.
+
+SKILLS AND MCP / BROWSER TOOLS
+
+Relevant skills already available and applied: design, frontend-design,
+premium-frontend-ui, gsap-react, gsap-scrolltrigger, gsap-core, gsap-timeline,
+gsap-performance, ui-styling, and shadcn. They are environment skills, so no
+separate project installation was needed. Motion uses GSAP and Lenis directly.
+The existing testimonial/footer sections were kept; 21st.dev and Magic UI
+components were not needed for this Round 3 implementation.
+
+Required tools to enable for later motion/ship reviews:
+
+  Context7          Live docs for Next.js, GSAP, R3F, and Lenis. Not exposed/connected.
+  Chrome DevTools   Inspect console, responsive layout, pins, and performance. Not exposed/connected.
+  Playwright MCP    Navigate, screenshot, and exercise scroll interactions. Not exposed/connected;
+                    a temporary Playwright install ran the local screenshot and viewport pass.
+  Browser MCP      Open/preview tabs and automate browser navigation. Not exposed/connected.
+  Git MCP          Inspect status and manage checkout/commits. Not exposed/connected.
+                   SareeX is not currently an initialized Git worktree.
+
+Do not claim an MCP review occurred unless the connection is available and used.
+If the MCPs remain unavailable, record that limitation and use local headless
+Chrome for available page and viewport checks. Local Chrome is installed at
+`/usr/bin/google-chrome`. The final screenshot pass used a temporary Playwright
+package with local Chrome; screenshots are saved under `screenshots/`. The MCP
+inspection features remain outstanding.
+
+TEMPORARY SHIP / REVIEW TOOLS (not project dependencies)
+
+  npm install --prefix /tmp/aurelia-playwright playwright
+    Playwright API used with /usr/bin/google-chrome for final local and deployed
+    desktop/mobile viewport checks and screenshots.
+
+  npm install --prefix /tmp/aurelia-vercel vercel
+    Vercel CLI used for the temporary preview deployment. The preview is live at
+    https://aurelia-sarees-teal.vercel.app/ in an unclaimed temporary scope;
+    an authenticated personal/team project is not linked in this workspace.
+
+Package naming note: npm marks `@studio-freight/lenis` deprecated and directs
+new installs to `lenis`. Use `import Lenis from 'lenis'` with the same sync
+snippet in PRD 04.

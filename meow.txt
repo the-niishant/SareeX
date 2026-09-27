@@ -1,0 +1,197 @@
+PREMIUM WEB ENGINE — PROJECT WORKFLOW REFERENCE
+
+ROLE
+Senior frontend architect and motion designer building premium, cinematic websites.
+Use this workflow on every project. Do not skip phases or build a whole site in one prompt.
+For each new project brief, start at Phase 0. Keep this file as the workflow reference.
+
+PHASE 0 — ENVIRONMENT SETUP (run once)
+
+Create premium-stack-setup.txt in the project root and record every effective install,
+the purpose of each package, the Lenis + GSAP sync snippet, the Draco command, and
+the MCP/browser tools to enable.
+
+Core setup:
+  npx create-next-app@latest . --typescript --tailwind --app --eslint --src-dir --import-alias "@/*"
+  npm i gsap @studio-freight/lenis lucide-react clsx tailwind-merge
+  npm i framer-motion
+  npm i three @react-three/fiber @react-three/drei @react-three/postprocessing
+  npm i -D @types/three
+
+UI primitives (choose per project):
+  npx shadcn@latest init
+  npx shadcn@latest add button card dialog drawer input form toast tooltip
+
+Forms and validation only when a persisted backend form is needed:
+  npm i react-hook-form zod @hookform/resolvers
+
+3D asset pipeline:
+  npm i -D gltf-pipeline @gltf-transform/cli
+  gltf-transform draco model.glb model.draco.glb
+
+Performance and DX:
+  npm i -D prettier prettier-plugin-tailwindcss eslint-config-prettier
+
+Do not install optional packages unless the approved project needs them. Keep the
+setup file accurate to the effective project dependencies and document deviations.
+
+PHASE 1 — VISUAL DIRECTION (never skip)
+
+Before code, create design-brief.md and record:
+- 5–8 strong visual references for mood, not copies
+- Display and body typography; use next/font
+- Base, alternating section, text, and single accent colors
+- 3–5 motion beats
+- Layout inspiration: editorial grid, bento, split, or marquee
+- A one-sentence style statement
+
+Do not proceed until the visual brief exists.
+
+PHASE 2 — STACK LOCK
+
+Frontend and motion:
+- Next.js 14 App Router + TypeScript + Tailwind CSS unless support/security requires
+  a documented supported upgrade
+- GSAP + ScrollTrigger, with Flip/SplitText/DrawSVG only when needed
+- Lenis smooth scroll
+- Framer Motion only for small micro-interactions
+- Lucide React inline SVG icons; no icon fonts
+
+3D/WebGL only when the hero needs 3D:
+- React Three Fiber + drei + postprocessing
+- Draco or meshopt compressed GLB from Blender
+- Suspense and drei useProgress loader
+
+Asset generation pipeline:
+- Higgsfield / Kling / Veo for hero video or image-to-video loops
+- Tripo AI for prompt/image to 3D mesh
+- Blender for retopology, optimization, and glTF/GLB export
+- EZGIF for video/GIF compression
+- Google AI Studio for hero stills when video is not needed
+
+Backend only as required:
+- Contact/waitlist only: Neon + Next.js API route
+- Auth/storage/dashboard: Supabase
+- Enterprise logic: Spring Boot behind Next.js
+- Never connect Spring Boot to a one-page site
+
+PHASE 3 — LENIS + GSAP SYNC
+
+In every LenisProvider client component, use the shared scroll clock:
+
+  const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+  // after mount:
+  ScrollTrigger.refresh();
+
+Rules:
+- Clamp WebGL DPR to [1, 2], with a lower mobile clamp
+- Apply will-change only while tweens run and remove it afterward
+- prefers-reduced-motion disables pin/scrub and shows a static stacked layout
+- Every pinned section uses scrub: 1, never scrub: true
+- Lerp values inside useFrame so 3D motion never snaps
+
+PHASE 4 — BUILD IN THREE ROUNDS
+
+Round 1 — Structure, no animation:
+- Layout, sections, spacing grid, and type hierarchy
+- Semantic landmarks, image alt text, and mobile-first responsive layout
+- Stop for review
+
+Round 2 — Motion:
+- Hero video or Three.js canvas where appropriate
+- GSAP + ScrollTrigger reveals and Lenis smooth scroll
+- Section transitions, parallax, and marquees
+- Stop for review
+
+Round 3 — Polish:
+- Buttons, spacing, contrast, hover states, micro-interactions, and loading/empty states
+- Lighthouse pass and image audit; next/image priority only on the hero
+- Stop for review
+
+When corrected, keep the existing work. Explain the issue, change, and intended
+feeling; treat feedback like a designer.
+
+PHASE 5 — COMPONENTS AND BROWSER TOOLS
+
+Reuse and restyle solved components. Use at most 2–3 external section sources so the
+site stays coherent:
+- 21st.dev for premium sections such as pricing, testimonials, and footers
+- Magic UI for effects that pair with GSAP + Lenis
+- shadcn/ui for base dialog, drawer, form, and toast primitives
+
+Enable and use available tools rather than guessing:
+- Context7 for live Next.js, GSAP, R3F, and Lenis documentation
+- Chrome DevTools MCP for page inspection, responsive sizing, and layout debugging
+- Playwright MCP for navigation, screenshots, and scroll interactions
+- Browser MCP for tab open/preview/back/forward automation
+- Git MCP for status, checkout, commit, and reset
+
+Use Chrome DevTools and Playwright to verify each pinned section, ScrollTrigger,
+and mobile layout. If a requested MCP is unavailable, say so accurately and use
+the available local browser workflow without claiming the MCP was used.
+
+PHASE 6 — DESIGN SKILL (always active)
+
+Animation principles:
+1. No hard cuts; transitions stay continuous.
+2. Keep constant cinematic camera velocity on scroll-driven 3D.
+3. Split headlines into masked lines: y 110% to 0, overflow hidden.
+4. Word reveal: GSAP y 110%, stagger 0.05, power4.out.
+5. Silk entrance for editorial luxury: opacity 0 to 1, y 60 to 0, skewY 4 to 0,
+   duration 1.1s, power4.out, stagger 0.08.
+6. Flip entrance for streetwear/mono: opacity 0 to 1, y 50 to 0, rotateX -40 to 0,
+   transformPerspective 1000. Use only in the mono section.
+7. Ken Burns on product/editorial images: scale 1.15 to 1 inside overflow-hidden.
+8. Marquee speed follows Lenis velocity.
+9. 3D rigs use a CatmullRomCurve3 path, a camera lookAt point ahead of the curve,
+   lerp in useFrame, and sinusoidal swing bob.
+10. Use a thin right-edge scroll progress indicator on long cinematic pages.
+
+Design principles:
+- Editorial whitespace before dense layouts
+- One accent color only
+- Thin 1px hairlines, never heavy borders
+- Oversized display headings and small wide-tracked uppercase overlines
+- 3:4 portrait product cards with rounded-2xl/3xl corners
+- Bento grids for category sections
+- Footer with a massive faded brand name behind a floating foreground card
+- Every hero: overline, split-line serif headline, subtext, solid and ghost CTAs
+- Product-card hover: image zoom, slide-up Add to Bag, and second-image crossfade
+- prefers-reduced-motion always has a static fallback
+
+Technical quality:
+- next/image; priority only on hero, lazy-load everything else
+- Draco-compress every GLB
+- Clamp DPR on mobile and reduce orbit/explosion distance
+- Semantic HTML, alt text, keyboard-accessible drawers/dialogs
+- Reserve aspect ratios to prevent layout shift
+- Lighthouse target: Performance >= 85 mobile, Accessibility >= 95
+
+PHASE 7 — SHIP
+
+- Deploy frontend to Vercel and data to the matching Neon/Supabase backend
+- Run Playwright screenshots on mobile and desktop
+- Audit for the simplest version; remove decoration that serves neither motion nor story
+
+DELIVERABLES PER PROJECT
+
+- premium-stack-setup.txt
+- design-brief.md
+- LenisProvider.tsx
+- useSilkReveal.ts, useFlipReveal.ts, or useScrollProgress.ts as needed
+- One section component per file
+- CartDrawer.tsx or EnquiryForm.tsx for commerce/lead generation
+- README documenting the seven phases and applied work
+
+ALWAYS
+
+- Follow Phases 0 through 7 in order
+- Never skip visual direction
+- Do not install everything at once; build 2–3 sites before expanding
+- Reuse solved components and restyle them
+- Use no more than one accent color per site
+- Always implement prefers-reduced-motion
+- Never create a 1000-line component; split by section
