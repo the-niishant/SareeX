@@ -9,19 +9,21 @@ export function NewArrivalsSection() {
   return (
     <section className="arrivals-section section-wrap" id="arrivals" aria-labelledby="arrivals-title">
       <TraditionalPattern variant="paisley" className="section-pattern arrivals-pattern" />
-      <div className="section-heading" data-silk-group>
-        <div>
-          <p className="eyebrow" data-silk-item>Just woven</p>
-          <h2 id="arrivals-title" data-silk-item>New arrivals</h2>
+      <div className="arrivals-content">
+        <div className="section-heading" data-silk-group>
+          <div>
+            <p className="eyebrow" data-silk-item>Just woven</p>
+            <h2 id="arrivals-title" data-silk-item>New arrivals</h2>
+          </div>
+          <a className="text-link" href="#showcase" data-silk-item>
+            View the collection <ArrowUpRight aria-hidden="true" size={16} />
+          </a>
         </div>
-        <a className="text-link" href="#showcase" data-silk-item>
-          View the collection <ArrowUpRight aria-hidden="true" size={16} />
-        </a>
-      </div>
-      <div className="product-grid" data-silk-group>
-        {arrivals.map((saree) => (
-          <ProductCard key={saree.id} saree={saree} />
-        ))}
+        <div className="product-grid" data-silk-group>
+          {arrivals.map((saree) => (
+            <ProductCard key={saree.id} saree={saree} />
+          ))}
+        </div>
       </div>
     </section>
   );

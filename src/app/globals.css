@@ -600,18 +600,29 @@ input:focus-visible {
   width: min(34vw, 28rem);
 }
 
+.arrivals-content {
+  width: min(100%, 48rem);
+  margin-inline: auto;
+}
+
 .product-grid {
   display: grid;
-  max-width: 76rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(1rem, 2vw, 1.75rem);
-  margin-inline: auto;
 }
 
 .arrivals-section .product-card {
   width: 100%;
-  max-width: 17.5rem;
+  max-width: 10.5rem;
   margin-inline: auto;
+}
+
+.arrivals-section .product-meta {
+  min-height: 5.5rem;
+}
+
+.arrivals-section .product-foot {
+  margin-top: auto;
 }
 
 .heading-aside {
@@ -1222,11 +1233,6 @@ input:focus-visible {
   .showcase-card:nth-child(2),
   .showcase-card:nth-child(5) {
     margin-top: 1.5rem;
-  }
-
-  .product-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    row-gap: 2.5rem;
   }
 
   .footer-links {
@@ -1958,6 +1964,22 @@ input:focus-visible {
 }
 
 @media (max-width: 900px) {
+  .arrivals-content {
+    max-width: 22rem;
+  }
+
+  .arrivals-section .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 2.25rem;
+  }
+
+  .arrivals-section .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1rem;
+  }
+
   .floating-saree {
     right: 5vw;
     bottom: 12%;
