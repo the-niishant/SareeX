@@ -2,26 +2,21 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { MutableRefObject, RefObject } from "react";
-import type Lenis from "lenis";
 import { useSilkReveal } from "@/hooks/useSilkReveal";
-import { sarees } from "@/lib/sarees";
 
 const clamp = gsap.utils.clamp;
 
 type MotionEngineProps = {
   scopeRef: RefObject<HTMLDivElement | null>;
   prefersReducedMotion: boolean;
-  lenisRef: MutableRefObject<Lenis | null>;
   velocityRef: MutableRefObject<number>;
 };
 
 export function MotionEngine({
   scopeRef,
   prefersReducedMotion,
-  lenisRef,
   velocityRef,
 }: MotionEngineProps) {
   useSilkReveal(scopeRef, !prefersReducedMotion);
@@ -30,7 +25,7 @@ export function MotionEngine({
     (_context) => {
       const root = scopeRef.current;
       if (!root || prefersReducedMotion) return;
-      gsap.registerPlugin(ScrollTrigger, Flip);
+      gsap.registerPlugin(ScrollTrigger);
       root.classList.add("motion-enabled");
       const manualCleanups: Array<() => void> = [];
       const media = gsap.matchMedia(root);
@@ -41,7 +36,6 @@ export function MotionEngine({
       const heroPattern = root.querySelector<HTMLElement>(".hero-pattern");
       const heroContent = root.querySelector<HTMLElement>(".hero-content");
       const floatingSaree = root.querySelector<HTMLElement>("[data-floating-saree]");
-      const showcase = root.querySelector<HTMLElement>(".showcase-section");
       const marquee = root.querySelector<HTMLElement>("[data-marquee-track]");
       const fabricLoops = Array.from(root.querySelectorAll<HTMLElement>("[data-fabric-layer]"), (layer, index) =>
         gsap.timeline({ repeat: -1, yoyo: true, paused: true, delay: index * 0.18 }).to(layer, {
@@ -256,21 +250,6 @@ export function MotionEngine({
         manualCleanups.push(() => pattern.classList.remove("is-animating"));
       });
 
-      if (showcase) {
-        const particles = showcase.querySelectorAll<HTMLElement>(".zari-particle");
-        gsap.to(particles, {
-          y: (index) => -24 - (index % 8) * 12,
-          x: (index) => (index % 2 ? 1 : -1) * (8 + (index % 5) * 4),
-          ease: "none",
-          scrollTrigger: {
-            trigger: showcase,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-        });
-      }
-
       media.add("(min-width: 901px)", () => {
         const mediaCleanups: Array<() => void> = [];
         if (hero && heroMedia && heroContent) {
@@ -290,119 +269,6 @@ export function MotionEngine({
             .to(heroContent, { y: -90, ease: "none" }, 0);
           if (heroPattern) heroTimeline.to(heroPattern, { y: -120, rotation: -3, scale: 1.04, ease: "none" }, 0);
           mediaCleanups.push(() => hero.classList.remove("is-animating"));
-        }
-
-        if (showcase) {
-          const cards = Array.from(showcase.querySelectorAll<HTMLElement>("[data-carousel-card]"));
-          const dots = Array.from(showcase.querySelectorAll<HTMLAnchorElement>("[data-carousel-dot]"));
-          const indexNode = showcase.querySelector<HTMLElement>("#showcase-index");
-          const nameNode = showcase.querySelector<HTMLElement>("#showcase-active-name");
-          const track = showcase.querySelector<HTMLElement>(".showcase-track");
-          const activeSarees = sarees.slice(0, cards.length);
-          let currentIndex = -1;
-          let carouselTrigger: ScrollTrigger | undefined;
-          const section = showcase;
-
-          const renderArc = (progress: number) => {
-            const last = Math.max(cards.length - 1, 1);
-            const center = clamp(0, last, progress * last);
-            const nearest = Math.round(center);
-            const radius = 1400;
-            const angleStep = 0.15;
-
-            cards.forEach((card, index) => {
-              const offset = index - center;
-              const distance = Math.abs(offset);
-              const angle = offset * angleStep;
-              let scale = 0.82;
-              let blur = 4;
-              let opacity = 0.5;
-              if (distance < 1) {
-                scale = 1.05 - distance * 0.15;
-                blur = distance * 2;
-                opacity = 1 - distance * 0.25;
-              } else if (distance < 2) {
-                scale = 0.9 - (distance - 1) * 0.08;
-                blur = 2 + (distance - 1) * 2;
-                opacity = 0.75 - (distance - 1) * 0.25;
-              }
-              const hidden = distance >= 3;
-              card.inert = hidden;
-              card.setAttribute("aria-hidden", String(hidden));
-              card.dataset.focused = String(distance < 0.5);
-              gsap.set(card, {
-                x: radius * Math.sin(angle),
-                y: radius * (1 - Math.cos(angle)),
-                xPercent: -50,
-                yPercent: -50,
-                scale,
-                rotateY: clamp(-8, 8, -offset * 6),
-                filter: `blur(${blur}px)`,
-                autoAlpha: hidden ? 0 : opacity,
-                zIndex: Math.round(100 - distance * 10),
-                pointerEvents: hidden ? "none" : "auto",
-              });
-            });
-
-            if (nearest !== currentIndex && activeSarees[nearest]) {
-              const nextSaree = activeSarees[nearest];
-              const flipTargets = [indexNode, nameNode].filter((node): node is HTMLElement => Boolean(node));
-              const state = flipTargets.length ? Flip.getState(flipTargets) : null;
-              currentIndex = nearest;
-              if (indexNode) indexNode.textContent = String(nearest + 1).padStart(2, "0");
-              if (nameNode) nameNode.textContent = nextSaree.name;
-              if (state) Flip.from(state, { duration: 0.45, ease: "power4.out", absolute: false, fade: true });
-              gsap.to(section, { "--accent": nextSaree.accentColor, duration: 0.65, ease: "power3.out", overwrite: "auto" });
-              dots.forEach((dot, index) => dot.classList.toggle("is-current", index === nearest));
-            }
-          };
-
-          const scrollState = { progress: 0 };
-          section.classList.add("is-pinned");
-          const carouselTimeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: () => `+=${window.innerHeight * 6}`,
-              pin: true,
-              scrub: 1,
-              anticipatePin: 1,
-              onToggle: (self) => section.classList.toggle("is-animating", self.isActive),
-              onRefresh: (self) => renderArc(self.progress),
-            },
-          });
-          carouselTimeline.to(scrollState, {
-            progress: 1,
-            duration: 1,
-            ease: "none",
-            onUpdate: () => renderArc(scrollState.progress),
-          });
-          carouselTrigger = carouselTimeline.scrollTrigger;
-          renderArc(0);
-
-          const onDotClick = (event: MouseEvent) => {
-            const dot = event.currentTarget as HTMLAnchorElement;
-            const index = Number(dot.dataset.carouselIndex ?? 0);
-            if (!carouselTrigger || !lenisRef.current || !Number.isFinite(index)) return;
-            event.preventDefault();
-            const progress = index / Math.max(cards.length - 1, 1);
-            const target = carouselTrigger.start + (carouselTrigger.end - carouselTrigger.start) * progress;
-            lenisRef.current.scrollTo(target, { duration: 1.1 });
-          };
-          dots.forEach((dot) => dot.addEventListener("click", onDotClick));
-
-          if (track) {
-            mediaCleanups.push(() => {
-              section.classList.remove("is-pinned", "is-animating");
-              dots.forEach((dot) => dot.removeEventListener("click", onDotClick));
-              cards.forEach((card) => {
-                card.inert = false;
-                card.removeAttribute("aria-hidden");
-                delete card.dataset.focused;
-              });
-              gsap.set(section, { clearProps: "--accent" });
-            });
-          }
         }
 
         const craft = root.querySelector<HTMLElement>(".craft-section");
@@ -495,7 +361,7 @@ export function MotionEngine({
     },
     {
       scope: scopeRef,
-      dependencies: [prefersReducedMotion, lenisRef, velocityRef],
+      dependencies: [prefersReducedMotion, velocityRef],
       revertOnUpdate: true,
     },
   );

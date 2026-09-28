@@ -8,7 +8,7 @@ import { formatPrice, type Saree } from "@/lib/sarees";
 type ProductCardProps = {
   saree: Saree;
   index?: number;
-  variant?: "grid" | "carousel" | "lookbook";
+  variant?: "grid" | "showcase" | "lookbook";
   caption?: string;
 };
 
@@ -25,8 +25,8 @@ export function ProductCard({
   const indexLabel = typeof index === "number" ? String(index + 1).padStart(2, "0") : null;
   const imageSizes = variant === "lookbook"
     ? "(max-width: 700px) 78vw, 40vw"
-    : variant === "carousel"
-      ? "(max-width: 700px) 70vw, (max-width: 1100px) 31vw, 17vw"
+    : variant === "showcase"
+      ? "(max-width: 550px) calc((100vw - 3.15rem) / 2), (max-width: 760px) 15.625rem, (max-width: 924px) calc((90vw - clamp(2rem, 4vw, 3.5rem)) / 3), (max-width: 1100px) 16.5rem, (max-width: 1422px) 21vw, 18.75rem"
       : "(max-width: 468px) calc((100vw - 3.15rem) / 2), (max-width: 1000px) 14rem, (max-width: 1100px) 21vw, 14rem";
 
   return (
@@ -65,9 +65,6 @@ export function ProductCard({
           )}
         </button>
         {saree.isNew && <span className="new-pill">New</span>}
-        {indexLabel && variant === "carousel" && (
-          <span className="product-index" aria-hidden="true">{indexLabel}</span>
-        )}
         <div className="product-image-tools">
           <button
             className="product-icon-button"

@@ -11,7 +11,7 @@ const MotionEngine = dynamic(
 
 export function MotionScope({ children }: { children: ReactNode }) {
   const scopeRef = useRef<HTMLDivElement>(null);
-  const { prefersReducedMotion, lenisRef, velocityRef } = useMotionContext();
+  const { prefersReducedMotion, velocityRef } = useMotionContext();
 
   return (
     <div className="motion-scope" ref={scopeRef}>
@@ -20,7 +20,6 @@ export function MotionScope({ children }: { children: ReactNode }) {
         <MotionEngine
           scopeRef={scopeRef}
           prefersReducedMotion={prefersReducedMotion}
-          lenisRef={lenisRef}
           velocityRef={velocityRef}
         />
       )}
