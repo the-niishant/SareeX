@@ -601,7 +601,7 @@ input:focus-visible {
 }
 
 .arrivals-content {
-  width: min(100%, 48rem);
+  width: min(100%, 60rem);
   margin-inline: auto;
 }
 
@@ -613,7 +613,7 @@ input:focus-visible {
 
 .arrivals-section .product-card {
   width: 100%;
-  max-width: 10.5rem;
+  max-width: 14rem;
   margin-inline: auto;
 }
 
@@ -1963,23 +1963,25 @@ input:focus-visible {
   transform-origin: top center;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .arrivals-content {
-    max-width: 22rem;
+    max-width: 30rem;
   }
 
   .arrivals-section .section-heading {
     align-items: flex-start;
     flex-direction: column;
-    gap: 1.2rem;
-    margin-bottom: 2.25rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
   }
 
   .arrivals-section .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem 1rem;
+    gap: 1.75rem 1rem;
   }
+}
 
+@media (max-width: 900px) {
   .floating-saree {
     right: 5vw;
     bottom: 12%;
@@ -1997,6 +1999,10 @@ input:focus-visible {
 }
 
 @media (max-width: 760px) {
+  .arrivals-section .section-heading .text-link {
+    margin-left: 0;
+  }
+
   .site-header {
     background: rgba(250, 247, 242, 0.96);
   }

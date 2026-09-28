@@ -27,7 +27,7 @@ export function ProductCard({
     ? "(max-width: 700px) 78vw, 40vw"
     : variant === "carousel"
       ? "(max-width: 700px) 70vw, (max-width: 1100px) 31vw, 17vw"
-      : "(max-width: 390px) 43vw, 168px";
+      : "(max-width: 468px) calc((100vw - 3.15rem) / 2), (max-width: 1000px) 14rem, (max-width: 1100px) 21vw, 14rem";
 
   return (
     <article
